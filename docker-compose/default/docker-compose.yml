@@ -1,36 +1,6 @@
 services:
-  userdb:
-    container_name: userdb
-    ports:
-      - 3306:3306
-    environment:
-      MYSQL_DATABASE: userdb
-    extends:
-      file: common-config.yml
-      service: microservice-db-config
-
-  productdb:
-    container_name: productdb
-    ports:
-      - 3307:3306
-    environment:
-      MYSQL_DATABASE: productdb
-    extends:
-      file: common-config.yml
-      service: microservice-db-config
-
-  ordersdb:
-    container_name: ordersdb
-    ports:
-      - 3308:3306
-    environment:
-      MYSQL_DATABASE: ordersdb
-    extends:
-      file: common-config.yml
-      service: microservice-db-config
-
   config-server:
-    image: "manikandan24vm/config-server:v2"
+    image: "manikandan24vm/config-server:v3"
     container_name: config-server-ms
     ports:
       - "8071:8071"
@@ -44,56 +14,73 @@ services:
       file: common-config.yml
       service: microservice-base-config
 
+  eureka-server:
+    image: "manikandan24vm/eureka-server-server:v3"
+    container_name: eureka-server-ms
+    ports:
+      - "8070:8070"
+    depends_on:
+      config-server:
+        condition: service_healthy
+    healthcheck:
+      test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: microservice-configserver-config
+    environment:
+      SPRING_APPLICATION_NAME: "eureka-server"
+
   user:
-    image: "manikandan24vm/user-service:v2"
+    image: "manikandan24vm/user-service:v3"
     container_name: user-service-ms
     ports:
       - "9091:9091"
     environment:
       SPRING_APPLICATION_NAME: "user"
-      SPRING_DATASOURCE_URL: "jdbc:mysql://userdb:3306/userdb"
     depends_on:
-      userdb:
-        condition: service_healthy
       config-server:
+        condition: service_healthy
+      eureka-server:
         condition: service_healthy
     extends:
       file: common-config.yml
-      service: microservice-configserver-config
+      service: microservice-eurekaserver-config
 
   product:
-    image: "manikandan24vm/product-service:v2"
+    image: "manikandan24vm/product-service:v3"
     container_name: product-ms
     ports:
       - "9092:9092"
     environment:
       SPRING_APPLICATION_NAME: "product"
-      SPRING_DATASOURCE_URL: "jdbc:mysql://productdb:3306/productdb"
     depends_on:
-      productdb:
-        condition: service_healthy
       config-server:
+        condition: service_healthy
+      eureka-server:
         condition: service_healthy
     extends:
       file: common-config.yml
-      service: microservice-configserver-config
+      service: microservice-eurekaserver-config
 
   orders:
-    image: "manikandan24vm/orders-service:v2"
+    image: "manikandan24vm/orders-service:v3"
     container_name: orders-ms
     ports:
       - "9093:9093"
     environment:
       SPRING_APPLICATION_NAME: "orders"
-      SPRING_DATASOURCE_URL: "jdbc:mysql://ordersdb:3306/ordersdb"
     depends_on:
-      ordersdb:
-        condition: service_healthy
       config-server:
+        condition: service_healthy
+      eureka-server:
         condition: service_healthy
     extends:
       file: common-config.yml
-      service: microservice-configserver-config
+      service: microservice-eurekaserver-config
 
 networks:
   ecommerce:
