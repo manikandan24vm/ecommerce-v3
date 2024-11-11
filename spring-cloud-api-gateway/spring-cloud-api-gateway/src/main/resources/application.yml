@@ -1,0 +1,32 @@
+spring:
+  config:
+    import: "optional:configserver:http://localhost:8071/"
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+
+
+  application:
+    name: apigateway
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    gateway:
+      enabled: true
+  info:
+    env:
+      enabled: true
+info:
+  app:
+    name: "api-gateway"
+    description: "api gateway microservice application"
+    version: "1.0.0"
+
+
+
+
