@@ -47,7 +47,12 @@ info:
     name: "user"
     description: "ecommerce user service application"
     version: "1.0.0"
-
+logging:
+  level:
+    com:
+      ecommerce:
+        user_service:
+          controller: DEBUG
 
 #spring.liquibase.change-log=classpath:db/liquibase-changelog.xml
 #spring.liquibase.enabled=true

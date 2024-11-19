@@ -30,7 +30,7 @@ public class ProductController {
             @ApiResponse(responseCode = "201",description = "product created successfully"),
             @ApiResponse(responseCode = "500",description = "internal server error",content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class)))
     })
-    @PostMapping("/product/{categoryName}")
+    @PostMapping("/products/{categoryName}")
     public ResponseEntity<ProductDTO> createProduct(@RequestBody @Valid ProductDTO productDTO, @PathVariable String categoryName){
         Product product= ProductMapper.toEntity(productDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(ProductMapper.toDTO(productService.createProduct(product,categoryName)));
@@ -40,7 +40,7 @@ public class ProductController {
             @ApiResponse(responseCode = "200",description = "product retrieved successfully"),
             @ApiResponse(responseCode = "500",description = "internal server error",content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class)))
     })
-    @GetMapping("/product")
+    @GetMapping("/products")
     public ResponseEntity<List<ProductDTO>> getAllProduct() {
        List<ProductDTO> productDTOList= productService.getAllProducts().stream().map(ProductMapper::toDTO).toList();
       return ResponseEntity.status(HttpStatus.OK).body(productDTOList);
@@ -50,7 +50,7 @@ public class ProductController {
             @ApiResponse(responseCode = "200",description = "product retrieved successfully"),
             @ApiResponse(responseCode = "500",description = "internal server error",content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class)))
     })
-    @GetMapping("/product/{productId}/{productName}")
+    @GetMapping("/products/{productId}/{productName}")
     public ResponseEntity<ProductDTO> getProductByIdOrName(@RequestParam(required = false) Long productId,@RequestParam(required = false) String productName){
         Product product=productService.getProductByIdOrName(productId,productName);
        return ResponseEntity.status(HttpStatus.OK).body(ProductMapper.toDTO(product));
@@ -60,12 +60,12 @@ public class ProductController {
             @ApiResponse(responseCode = "200",description = "product updated successfully"),
             @ApiResponse(responseCode = "500",description = "internal server error",content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class)))
     })
-    @PutMapping("/product/{productId}")
+    @PutMapping("/products/{productId}")
     public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long productId,@RequestBody @Valid ProductDTO productDTO){
         ProductDTO product= ProductMapper.toDTO(productService.updateById(productId,ProductMapper.toEntity(productDTO)));
         return ResponseEntity.status(HttpStatus.OK).body(product);
     }
-    @DeleteMapping("/product/{productId}")
+    @DeleteMapping("/products/{productId}")
     @Operation(description = "Delete the product",summary = "provides ability to delete the existing product")
     @ApiResponses({
             @ApiResponse(responseCode = "200",description = "product deleted successfully"),
